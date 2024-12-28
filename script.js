@@ -1,48 +1,48 @@
-const canvas = document.getElementById("canvas");
-const fileInput = document.getElementById("fileInput");
-const addMediaButton = document.getElementById("addMediaButton");
+document.getElementById('fileInput').addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.left = '50px';
+      img.style.top = '50px';
+      img.draggable = false;
 
-addMediaButton.addEventListener("click", () => {
-    fileInput.click();
-});
+      const removeButton = document.createElement('button');
+      removeButton.innerText = 'X';
+      removeButton.onclick = () => img.remove();
 
-fileInput.addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+      img.onclick = () => {
+        const scale = prompt('Enter scale (e.g., 1.5 for 150%):', 1);
+        if (scale) img.style.transform = `scale(${scale})`;
+      };
 
-    const url = URL.createObjectURL(file);
-    const type = file.type.startsWith("image") ? "img" : "video";
+      img.addEventListener('mousedown', (e) => {
+        let offsetX = e.clientX - img.offsetLeft;
+        let offsetY = e.clientY - img.offsetTop;
 
-    const element = document.createElement(type);
-    element.src = url;
-    element.classList.add("media");
-    element.draggable = true;
-    element.style.width = "200px"; // Tamaño inicial
-    element.style.top = "50px";
-    element.style.left = "50px";
+        const move = (event) => {
+          img.style.left = `${event.clientX - offsetX}px`;
+          img.style.top = `${event.clientY - offsetY}px`;
+        };
 
-    if (type === "video") {
-        element.autoplay = true;
-        element.loop = true;
-        element.muted = true;
-    }
+        const stopMove = () => {
+          document.removeEventListener('mousemove', move);
+          document.removeEventListener('mouseup', stopMove);
+        };
 
-    canvas.appendChild(element);
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', stopMove);
+      });
 
-    // Drag and Drop
-    element.addEventListener("dragstart", (e) => {
-        e.dataTransfer.setData("text/plain", null);
-        element.dataset.offsetX = e.offsetX;
-        element.dataset.offsetY = e.offsetY;
-    });
+      const container = document.createElement('div');
+      container.style.position = 'relative';
+      container.appendChild(img);
+      container.appendChild(removeButton);
 
-    canvas.addEventListener("dragover", (e) => e.preventDefault());
-
-    canvas.addEventListener("drop", (e) => {
-        e.preventDefault();
-        const offsetX = e.target.dataset.offsetX || 0;
-        const offsetY = e.target.dataset.offsetY || 0;
-        element.style.left = `${e.clientX - offsetX}px`;
-        element.style.top = `${e.clientY - offsetY}px`;
-    });
+      document.getElementById('canvas').appendChild(container);
+    };
+    reader.readAsDataURL(file);
+  }
 });
