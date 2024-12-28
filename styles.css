@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
+#canvas {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+.media {
+    position: absolute;
+    cursor: move;
+}
+
+#addMediaButton {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    z-index: 9999;
+    padding: 10px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
